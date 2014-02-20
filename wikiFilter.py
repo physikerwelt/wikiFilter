@@ -14,7 +14,7 @@ def split_xml( filename, splitsize, dir, tag):
     pagecount = 0
     filecount = 1
     ismath=2
-    header="<mediawiki>"
+    header=""
     footer="</mediawiki>"
     tempstr = ""
     #open chunkfile in write mode
