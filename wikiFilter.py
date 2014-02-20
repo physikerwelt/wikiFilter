@@ -60,6 +60,68 @@ def split_xml( filename, splitsize, dir, tag):
     except:
         print 'Files already close'
 
+def download(url):
+
+    opener = urllib2.build_opener();
+    localfile = url.split('/')[-1]
+
+    count = 0 # Counts downloaded size.
+    downloading = True
+    success = False
+    buf = ''
+    while (not(success) and downloading):
+        try:
+            Err = ""
+            _netfile = opener.open(url)
+            filesize = float(_netfile.info()['Content-Length'])
+
+            if (os.path.exists(localfile) and os.path.isfile(localfile)):
+                count = os.path.getsize(localfile)
+            print count,"of",filesize,"downloaded."
+            if count >= filesize:
+                #already downloaded
+                downloading = False
+                success = True
+                _netfile.close()
+                return
+            count = 0
+            if (os.path.exists(localfile) and os.path.isfile(localfile)):
+                #File already exists, start where it left off:
+                #This seems to corrupt the file sometimes?
+                _netfile.close()
+                req = urllib2.Request(url)
+                print "file downloading at byte: ",count
+                req.add_header("Range","bytes=%s-" % (count))
+                _netfile = opener.open(req)
+            if (downloading): #Don't do it if cancelled, downloading=false.
+                next = _netfile.read(block_size)
+                #s = BitArray(next)
+                decompressed = decompressor.decompress(next)
+                _outfile = open(localfile,"ab") #to append binary
+                _outfile.write(next)
+                count += block_size
+                while (len(next)>0 and downloading):
+                    next = _netfile.read(block_size)
+                    decompressed = decompressor.decompress(next)
+                    #time.sleep(.1)
+                
+                    #p = s.find('0x314159265359')
+                    #print p
+                    #sys.stdout.flush()
+                    #print 'Length {0:6d}  buffer {1:6d}\r'.format(len(decompressed), len(decompressor.unused_data ))
+                    #print len(decompressed)+','+len(decompressor.unused_data)
+                    sys.stdout.write("Download progress: %d   \r" % (len(decompressed)) )
+                    _outfile.write(next)
+                    count += len(next)
+                success = True
+        except IOError, e:
+            print e
+            Err=("Download error, retrying in a few seconds: "+str(e))
+            try:
+                _netfile.close()
+            except Exception:
+                pass
+            time.sleep(1) #Then repeat
 if __name__ == '__main__': # When the script is self run
     parser = argparse.ArgumentParser(description='extract wikipages that contain the math tag')
     parser.add_argument('-f', '--filename', help='the bz2-file to be split and filtered',
