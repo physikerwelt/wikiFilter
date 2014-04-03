@@ -42,7 +42,7 @@ def split_xml( filename, splitsize, dir, tag, template):
             ismath=1
             pagecount += 1
             print splitsize*filecount+ pagecount
-        if template and '<ns>10</ns>' in line:
+        if template and ('<ns>10</ns>' in line or '<ns>828</ns>' in line) :
             ismath=1
             pagecount += 1
             print 'template'        
