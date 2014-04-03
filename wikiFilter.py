@@ -3,7 +3,7 @@ import os
 import bz2
 import argparse
 
-def split_xml( filename, splitsize, dir, tag):
+def split_xml( filename, splitsize, dir, tag, template):
     ''' The function gets the filename of wiktionary.xml.bz2 file as  input and creates
     smallers chunks of it in a the diretory chunks
     '''
@@ -42,6 +42,10 @@ def split_xml( filename, splitsize, dir, tag):
             ismath=1
             pagecount += 1
             print splitsize*filecount+ pagecount
+        if template and '<ns>10</ns>' in line:
+            ismath=1
+            pagecount += 1
+            print 'template'        
         if '</page>' in line:
             if ismath==1:
                 chunkfile.write(tempstr)
@@ -71,5 +75,7 @@ if __name__ == '__main__': # When the script is self run
     parser.add_argument('-t', '--tagname', help='the tag to search for (default math)',
         default='math', type=str, dest='tag')
     parser.add_argument("-v", "--verbosity", action="count", default=0)
+    parser.add_argument('-T', '--template', help='include all templates',
+        action="store_true", dest='template')
     args = parser.parse_args()
-    split_xml( args.file, args.size, args.dir, args.tag )
+    split_xml( args.file, args.size, args.dir, args.tag, args.template )
