@@ -1,0 +1,5 @@
+#!/bin/sh
+rm enwiki-latest-pages-articles.xml.bz2
+wget https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2
+./wikiFilter.py
+mwscript importDump.php wout/chunk-1.xml.bz2
