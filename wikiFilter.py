@@ -65,17 +65,17 @@ def split_xml( filename, splitsize, dir, tag, template):
         print 'Files already close'
 
 if __name__ == '__main__': # When the script is self run
-    parser = argparse.ArgumentParser(description='extract wikipages that contain the math tag')
+    parser = argparse.ArgumentParser(description='extract wikipages that contain the math tag',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-f', '--filename', help='the bz2-file to be split and filtered',
         default='enwiki-latest-pages-articles.xml.bz2', dest='file')
     parser.add_argument('-s', '--splitsize', help='the number of pages contained in each split',
         default=1000000, type=int, dest='size')
     parser.add_argument('-d', '--outputdir', help='the directory name where the files go',
         default='wout', type=str, dest='dir')
-    parser.add_argument('-t', '--tagname', help='the tag to search for (default math)',
+    parser.add_argument('-t', '--tagname', help='the tag to search for',
         default='math', type=str, dest='tag')
     parser.add_argument("-v", "--verbosity", action="count", default=0)
     parser.add_argument('-T', '--template', help='include all templates',
         action="store_true", dest='template')
     args = parser.parse_args()
-    split_xml( args.file, args.size, args.dir, args.tag, args.template )
