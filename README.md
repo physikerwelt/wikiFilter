@@ -21,13 +21,15 @@ extract wikipages that contain the math tag
 optional arguments:
   -h, --help            show this help message and exit
   -f FILE, --filename FILE
-                        the bz2-file to be split and filtered
+                        the bz2-file to be split and filtered (default:
+                        enwiki-latest-pages-articles.xml.bz2)
   -s SIZE, --splitsize SIZE
-                        the number of pages contained in each split
+                        the number of pages contained in each split (default:
+                        1000000)
   -d DIR, --outputdir DIR
-                        the directory name where the files go
+                        the directory name where the files go (default: wout)
   -t TAG, --tagname TAG
-                        the tag to search for (default math)
+                        the tag to search for (default: math)
   -v, --verbosity
-  -T, --template        include all templates
+  -T, --template        include all templates (default: False)
 ```
