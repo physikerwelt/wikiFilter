@@ -1,0 +1,9 @@
+#!/bin/bash
+m=$2
+fn=$1
+headEnd=$(grep -nm1 "<page>" $fn | cut -f1 -d: )
+head -n$((headEnd-1)) $fn
+lines=$(wc -l $fn| cut -f1 -d' ')
+pageStart=$(grep -n -m$m '</page>' $fn | tail -n1| cut -f1 -d:)
+lastLines=$(($lines-$pageStart+1))
+tail -n$lastLines $fn
