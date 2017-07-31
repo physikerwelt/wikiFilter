@@ -3,25 +3,26 @@ import os
 import bz2
 import argparse
 
-def split_xml( filename, splitsize, dir, tags, template):
+
+def split_xml(filename, splitsize, dir, tags, template):
     ''' The function gets the filename of wiktionary.xml.bz2 file as  input and creates
     smallers chunks of it in a the diretory chunks
     '''
     # Check and create chunk diretory
-    if not os.path.exists( dir ):
-        os.mkdir( dir )
+    if not os.path.exists(dir):
+        os.mkdir(dir)
     # Counters
     pagecount = 0
     filecount = 1
-    ismath=2
-    header=""
-    footer="</mediawiki>"
+    ismath = 2
+    header = ""
+    footer = "</mediawiki>"
     tempstr = ""
-    #open chunkfile in write mode
-    chunkname = lambda filecount: os.path.join( dir, "chunk-" + str(filecount) + ".xml.bz2")
-    chunkfile = bz2.BZ2File( chunkname( filecount ), 'w')
+    # open chunkfile in write mode
+    chunkname = lambda filecount: os.path.join(dir, "chunk-" + str(filecount) + ".xml.bz2")
+    chunkfile = bz2.BZ2File(chunkname(filecount), 'w')
     # Read line by line
-    bzfile = bz2.BZ2File( filename )
+    bzfile = bz2.BZ2File(filename)
     tags = tags.split(',')
     # the header
     for line in bzfile:
@@ -34,31 +35,31 @@ def split_xml( filename, splitsize, dir, tags, template):
     for line in bzfile:
         # the </page> determines new wiki page
         if '<page' in line:
-            if ismath == 2: #start
+            if ismath == 2:  # start
                 tempstr = header
             ismath = 0
             tempstr = ""
         tempstr = tempstr + line
         for tag in tags:
             if '&lt;' + tag in line:
-                ismath=1
+                ismath = 1
                 pagecount += 1
-                print splitsize*filecount+ pagecount
-        if template and ('<ns>10</ns>' in line or '<ns>828</ns>' in line) :
-            ismath=1
+                print splitsize * filecount + pagecount
+        if template and ('<ns>10</ns>' in line or '<ns>828</ns>' in line):
+            ismath = 1
             pagecount += 1
             print 'template'
         if '</page>' in line:
-            if ismath==1:
+            if ismath == 1:
                 chunkfile.write(tempstr)
-                tempstr=""
+                tempstr = ""
         if pagecount > splitsize:
-            #print chunkname() # For Debugging
+            # print chunkname() # For Debugging
             chunkfile.write(footer)
             chunkfile.close()
-            pagecount = 0 # RESET pagecount
-            filecount += 1 # increment filename
-            chunkfile = bz2.BZ2File( chunkname( filecount ), 'w')
+            pagecount = 0  # RESET pagecount
+            filecount += 1  # increment filename
+            chunkfile = bz2.BZ2File(chunkname(filecount), 'w')
             chunkfile.write(header)
     try:
         chunkfile.write(footer)
@@ -66,7 +67,8 @@ def split_xml( filename, splitsize, dir, tags, template):
     except:
         print 'Files already close'
 
-if __name__ == '__main__': # When the script is self run
+
+if __name__ == '__main__':  # When the script is self run
     parser = argparse.ArgumentParser(description='extract wikipages that contain the math tag',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-f', '--filename', help='the bz2-file to be split and filtered',
