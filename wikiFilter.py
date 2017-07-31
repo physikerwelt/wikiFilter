@@ -3,7 +3,7 @@ import os
 import bz2
 import argparse
 
-def split_xml( filename, splitsize, dir, tag, template):
+def split_xml( filename, splitsize, dir, tags, template):
     ''' The function gets the filename of wiktionary.xml.bz2 file as  input and creates
     smallers chunks of it in a the diretory chunks
     '''
@@ -22,6 +22,7 @@ def split_xml( filename, splitsize, dir, tag, template):
     chunkfile = bz2.BZ2File( chunkname( filecount ), 'w')
     # Read line by line
     bzfile = bz2.BZ2File( filename )
+    tags = tags.split(',')
     # the header
     for line in bzfile:
         header += line
@@ -38,14 +39,15 @@ def split_xml( filename, splitsize, dir, tag, template):
             ismath = 0
             tempstr = ""
         tempstr = tempstr + line
-        if '&lt;' + tag in line:
-            ismath=1
-            pagecount += 1
-            print splitsize*filecount+ pagecount
+        for tag in tags:
+            if '&lt;' + tag in line:
+                ismath=1
+                pagecount += 1
+                print splitsize*filecount+ pagecount
         if template and ('<ns>10</ns>' in line or '<ns>828</ns>' in line) :
             ismath=1
             pagecount += 1
-            print 'template'        
+            print 'template'
         if '</page>' in line:
             if ismath==1:
                 chunkfile.write(tempstr)
@@ -73,9 +75,10 @@ if __name__ == '__main__': # When the script is self run
         default=1000000, type=int, dest='size')
     parser.add_argument('-d', '--outputdir', help='the directory name where the files go',
         default='wout', type=str, dest='dir')
-    parser.add_argument('-t', '--tagname', help='the tag to search for',
-        default='math', type=str, dest='tag')
+    parser.add_argument('-t', '--tagname', help='comma separated list of the tag names to search for',
+        default='math,ce,chem', type=str, dest='tags')
     parser.add_argument("-v", "--verbosity", action="count", default=0)
     parser.add_argument('-T', '--template', help='include all templates',
         action="store_true", dest='template')
     args = parser.parse_args()
+    split_xml(args.file, args.size, args.dir, args.tags, args.template)
