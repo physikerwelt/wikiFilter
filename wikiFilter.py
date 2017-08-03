@@ -41,7 +41,7 @@ def split_xml(filename, splitsize, dir, tags, template):
             tempstr = ""
         tempstr = tempstr + line
         for tag in tags:
-            if '&lt;' + tag in line:
+            if '&lt;/' + tag + '&gt;' in line:
                 ismath = 1
                 pagecount += 1
                 print splitsize * filecount + pagecount
