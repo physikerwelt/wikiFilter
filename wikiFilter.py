@@ -4,7 +4,7 @@ import bz2
 import argparse
 
 
-def split_xml(filename, splitsize, dir, tags, template):
+def split_xml(filename, splitsize, dir, tags, template, keywords):
     ''' The function gets the filename of wiktionary.xml.bz2 file as  input and creates
     smallers chunks of it in a the diretory chunks
     '''
@@ -14,7 +14,7 @@ def split_xml(filename, splitsize, dir, tags, template):
     # Counters
     pagecount = 0
     filecount = 1
-    ismath = 2
+    ismatch = 2
     header = ""
     footer = "</mediawiki>"
     tempstr = ""
@@ -35,22 +35,27 @@ def split_xml(filename, splitsize, dir, tags, template):
     for line in bzfile:
         # the </page> determines new wiki page
         if '<page' in line:
-            if ismath == 2:  # start
+            if ismatch == 2:  # start
                 tempstr = header
-            ismath = 0
+            ismatch = 0
             tempstr = ""
         tempstr = tempstr + line
         for tag in tags:
             if '&lt;/' + tag + '&gt;' in line:
-                ismath = 1
+                ismatch = 1
+                pagecount += 1
+                print splitsize * filecount + pagecount
+        for keyword in keywords:
+            if keyword in line:
+                ismatch = 1
                 pagecount += 1
                 print splitsize * filecount + pagecount
         if template and ('<ns>10</ns>' in line or '<ns>828</ns>' in line):
-            ismath = 1
+            ismatch = 1
             pagecount += 1
             print 'template'
         if '</page>' in line:
-            if ismath == 1:
+            if ismatch == 1:
                 chunkfile.write(tempstr)
                 tempstr = ""
         if pagecount > splitsize:
@@ -79,8 +84,10 @@ if __name__ == '__main__':  # When the script is self run
         default='wout', type=str, dest='dir')
     parser.add_argument('-t', '--tagname', help='comma separated list of the tag names to search for',
         default='math,ce,chem', type=str, dest='tags')
+    parser.add_argument('-k', '--keyword', help='comma separated list of the keywords to search for',
+        default='', type=str, dest='keywords')
     parser.add_argument("-v", "--verbosity", action="count", default=0)
     parser.add_argument('-T', '--template', help='include all templates',
         action="store_true", dest='template')
     args = parser.parse_args()
-    split_xml(args.file, args.size, args.dir, args.tags, args.template)
+    split_xml(args.file, args.size, args.dir, args.tags, args.template, args.keywords)
