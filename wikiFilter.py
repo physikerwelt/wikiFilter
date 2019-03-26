@@ -24,6 +24,7 @@ def split_xml(filename, splitsize, dir, tags, template, keywords):
     # Read line by line
     bzfile = bz2.BZ2File(filename)
     tags = tags.split(',')
+    keywords = keywords.split(',')
     # the header
     for line in bzfile:
         header += line
@@ -35,10 +36,8 @@ def split_xml(filename, splitsize, dir, tags, template, keywords):
     for line in bzfile:
         # the </page> determines new wiki page
         if '<page' in line:
-            if ismatch == 2:  # start
-                tempstr = header
-            ismatch = 0
             tempstr = ""
+            ismatch = 0
         tempstr = tempstr + line
         for tag in tags:
             if '&lt;/' + tag + '&gt;' in line:
