@@ -34,10 +34,6 @@ def split_xml(filename, splitsize, dir, total, size):
     i = 0
     # and the rest
     for line in bzfile:
-        if b'</page>' in line:
-            if ismatch == 1:
-                chunkfile.write(tempstr)
-                tempstr = b''
         # the </page> determines new wiki page
         if b'<page' in line:
             tempstr = b''
@@ -48,6 +44,10 @@ def split_xml(filename, splitsize, dir, total, size):
                 pagecount += 1
                 print(splitsize * filecount + pagecount, i)
         tempstr = tempstr + line
+        if b'</page>' in line:
+            if ismatch == 1:
+                chunkfile.write(tempstr)
+                tempstr = b''
         if pagecount > splitsize:
             # print chunkname() # For Debugging
             chunkfile.write(footer)
